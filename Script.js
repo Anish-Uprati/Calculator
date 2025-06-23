@@ -1,33 +1,58 @@
 let input = document.getElementById('inputBOx');
 let buttons = document.querySelectorAll('button');
 let string = "";
+let evaluated = false;  
 let arr = Array.from(buttons);
 
 arr.forEach(button => {
     button.addEventListener('click', (e) => {
-        if (e.target.innerHTML == '=') {
+        const value = e.target.innerHTML;
+
+        if (value === '=') {
             try {
-                string = string.replace(/%/g, "/100");  
-                string = eval(string);
-                input.value = string;
+                if (string.trim() === "") {
+                    string = "0";
+                }
+                
+                if (!evaluated) {
+                    string = string.replace(/%/g, "/100");
+                    string = eval(string).toString();
+                    input.value = string;
+                    evaluated = true;  
+                } else {
+                    
+                    input.value = string;
+                }
             } catch {
                 input.value = "Error";
+                string = "";
+                evaluated = false;
             }
         }
-        else if (e.target.innerHTML == "AC") {
+        else if (value === "AC") {
             string = "";
-            input.value = string;
+            input.value = "";
+            evaluated = false;
         }
-        else if (e.target.innerHTML == "DEL") {
-            string = string.substring(0, string.length - 1);
-            input.value = string;
-        }
-        else if (e.target.innerHTML == "%") {
-            string += "%";
-            input.value = string;
+        else if (value === "DEL") {
+            
+            if (evaluated) {
+                string = "";
+                input.value = "";
+                evaluated = false;
+            } else {
+                string = string.slice(0, -1);
+                input.value = string;
+            }
         }
         else {
-            string += e.target.innerHTML;
+        
+            if (evaluated) {
+                string = value;
+                evaluated = false;
+            } else {
+                string += value;
+            }
             input.value = string;
         }
     });
